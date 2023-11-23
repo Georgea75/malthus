@@ -1,14 +1,17 @@
 [tool.poetry]
 name = "malthus"
 version = "0.1.0"
-description = ""
+description = "Malthus is a Python library for building and running population models."
 authors = ["George Alexander <george.alexander@arup.com>"]
 readme = "README.md"
+license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-matplotlib = "^3.8.0"
 
+[tool.poetry.group.dev.dependencies]
+black = "^23.11.0"
+pytest = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]
