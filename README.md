@@ -170,5 +170,4 @@ The project uses black as a formatter.
 Malthus is available under the [MIT](https://opensource.org/license/mit/) license.
 
 # things to deal with
-- Clean up docs
 - Release
