@@ -2,7 +2,7 @@
 name = "malthus"
 version = "0.1.0"
 description = "Malthus is a Python library for building and running population models."
-authors = ["George Alexander <george.alexander@arup.com>"]
+authors = ["George Alexander <georgetucker.a@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 

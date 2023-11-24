@@ -4,6 +4,12 @@ Malthus is a Python library for building and running population models.
 
 ## Installation
 
+Malthus is available through [PyPI](https://pypi.org/project/malthus/)
+
+```
+pip install malthus
+```
+
 ## Usage
 
 ### Generating birth and death functions
@@ -35,7 +41,7 @@ The model constructor takes three arguments:
 ```
 from malthus import models
 
-model = models.PopulationDynamicsModel()
+model = models.PopulationDynamicsModel(100)
 ```
 
 ### Obtaining results
@@ -80,25 +86,21 @@ model.describe(10)
 
 #### Compute
 
-The compute function returns the births, deaths, and total population from the current time step to the step provided to the function.
+The compute function returns the births, deaths, and total population from the current time step to the step provided to the function. The use of compute does not change the current step of the iterator.
 
-Compute takes two arguments:
+Compute takes one argument:
 
 - step (int): The time step that the model should calculate up to and included the provided step. 
 
-- reset (boolean): If this is set to true the model with reset the iterators step to zero. This has a default value of true. 
-
 ```
-
-model.compute(10,false)
-
+model.compute(10)
 ```
 
 ## Documentation
 
 ### Models
 
-#### Class: PopulationDynamics Model
+#### Class: PopulationDynamicsModel
 
 The `PopulationDynamicsModel` class represents a basic population dynamics model. It simulates the changes in population over successive steps, considering births and deaths. The model is designed to be iterated over, allowing users to generate and analyze population data for different steps.
 
@@ -156,19 +158,6 @@ The "Birth Functions" module provides a collection of birth rate functions suita
 
 This library is named after the scholar Thomas Malthus. Malthus was an influential economist mainly known for his work on population dynamics, and the development of the Malthusian growth model. 
 
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first
-to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-The project uses black as a formatter.
-
 ## License
 
 Malthus is available under the [MIT](https://opensource.org/license/mit/) license.
-
-# things to deal with
-- Clean up docs
-- Release
