@@ -19,8 +19,8 @@ To instantiate a model death and birth function needs to be declared.
 ```
 from malthus import death, birth
 
-model.death = death.linearDeath(0.01)
-model.birth = birth.MalthusianBirth(0.01, 100)
+death = death.linearDeath(0.01)
+birth = birth.MalthusianBirth(0.01, 100)
 
 ```
 
@@ -46,7 +46,7 @@ model = models.PopulationDynamicsModel(100)
 
 ### Obtaining results
 
-Malthus currently provides three methods for running the model.
+Malthus currently provides three ways to run the model.
 
 #### Iterator
 
