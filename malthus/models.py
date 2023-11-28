@@ -34,8 +34,6 @@ class PopulationDynamicsModel:
         Lastly the new total population is summed by adding the deaths to the population with the
         current steps birth.
 
-        NOTE CHECK THAT THIS IS CORRECT
-
         returns:
             tuple: A tuple containing the number of deaths and births, and the total population
         """
