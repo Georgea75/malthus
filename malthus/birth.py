@@ -3,6 +3,7 @@ Birth functions
 
 A collection of birth rate functions suitable for population dynamics models. 
 """
+
 from typing import Callable
 import math
 

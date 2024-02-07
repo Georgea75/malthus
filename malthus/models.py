@@ -4,6 +4,7 @@ Population Dynamics Model
 Represents a population dynamics model.
 
 """
+
 from typing import Tuple, List, Iterator, Callable
 import logging
 

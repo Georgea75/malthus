@@ -3,6 +3,7 @@ Death functions
 
 A collection of death rate functions suitable for population dynamics models. 
 """
+
 from typing import Callable
 
 
