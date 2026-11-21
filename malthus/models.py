@@ -1,10 +1,3 @@
-"""
-Population Dynamics Model
-
-Represents a population dynamics model.
-
-"""
-
 from typing import Tuple, List, Iterator, Callable
 import logging
 
@@ -21,33 +14,32 @@ class PopulationDynamicsModel:
         self.logger = logging.getLogger(__name__)
 
         self.population = input_population
+        self.initial_population = input_population
         self.death = death_function
         self.birth = birth_function
         self.step = 0
 
     def __next__(self) -> Tuple[float, float, float]:
         """
-        Generates the next value of the population model.
+        Advances the model by one time step.
 
-        Advances the model by one step and calculates the deaths, births, and total population.
-        It does this by first calculating the number of births in the step, it then calculates
-        the total number of deaths using the last steps population combined with the new births.
-        Lastly the new total population is summed by adding the deaths to the population with the
-        current steps birth.
+        Births and deaths are both calculated from the population at the start
+        of the step, P_t, and the population is updated using the discrete
+        balancing equation:
+
+            P_{t+1} = P_t + B_t - D_t
 
         returns:
-            tuple: A tuple containing the number of deaths and births, and the total population
+            tuple: (deaths, births, population at the end of the step)
         """
 
-        step_births = self.birth(self.step)
-        population_with_step_births = self.population + step_births
+        step_births = self.birth(self.population, self.step)
+        step_deaths = self.death(self.population, self.step)
 
-        step_deaths = self.death(population_with_step_births)
-        step_population = population_with_step_births + step_deaths
-
+        self.population = self.population + step_births - step_deaths
         self.step += 1
 
-        return step_deaths, step_births, step_population
+        return step_deaths, step_births, self.population
 
     def __iter__(self) -> Iterator:
         """
@@ -77,25 +69,33 @@ class PopulationDynamicsModel:
 
     def compute(self, steps: int) -> Tuple[List[float], List[float], List[float]]:
         """
-        Retrieves the next n steps of the modelled data and returns it as three arrays. The step of the iterator
-        is not modified.
+        Runs the model from the initial population for the given number of
+        steps and returns the results as three lists. The iterator's current
+        step and population are not modified.
 
         Arguments:
-            int: steps, the maximum step to compute the results for.
+            int: steps, the number of steps to compute.
 
         Returns:
             list: death_data, deaths recorded in each step
             list: birth_data, births recorded in each step
-            list: population_data, total population in each step
+            list: population_data, total population at the end of each step
         """
 
         original_step = self.step
+        original_population = self.population
         self.step = 0
+        self.population = self.initial_population
 
-        death_data, birth_data, population_data = zip(
-            *[(next(self)) for _ in range(steps)]
-        )
+        try:
+            results = [next(self) for _ in range(steps)]
+        finally:
+            self.step = original_step
+            self.population = original_population
 
-        self.step = original_step
+        if not results:
+            return [], [], []
+
+        death_data, birth_data, population_data = zip(*results)
 
         return list(death_data), list(birth_data), list(population_data)

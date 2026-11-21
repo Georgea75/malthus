@@ -3,42 +3,20 @@ import malthus.death as death
 
 
 @pytest.mark.parametrize(
-    "description, function, population, expected_result",
+    "d, population, expected",
     [
-        ("Tests a negative population", death.malthusian_death(0.01), -100, 1),
-        ("Tests a zero population", death.malthusian_death(0.01), 0, 0),
-        ("Tests a zero death rate", death.malthusian_death(0.0), 100, 0),
-        ("Tests simple valid calculation", death.malthusian_death(0.01), 100, -1),
-        (
-            "Tests decimals in input population",
-            death.malthusian_death(0.03),
-            2152.24364,
-            -64.5673092,
-        ),
-        (
-            "Tests large population",
-            death.malthusian_death(0.01),
-            999999999999999,
-            -9999999999999.99,
-        ),
-        (
-            "Tests very low death rate",
-            death.malthusian_death(0.00001),
-            436534563456,
-            -4365345.63456,
-        ),
+        pytest.param(0.01, 0, 0, id="zero population"),
+        pytest.param(0.0, 100, 0, id="zero death rate"),
+        pytest.param(0.01, 100, 1, id="simple calculation"),
+        pytest.param(0.03, 2152.24364, 64.5673092, id="decimal population"),
+        pytest.param(0.01, 999999999999999, 9999999999999.99, id="large population"),
+        pytest.param(1.0, 100, 100, id="everyone dies"),
     ],
 )
-def test_malthus_death_function(description, function, population, expected_result):
-    """
-    Tests the malthus death function using a parametrized set of inputs
+def test_malthusian_death(d, population, expected):
+    assert death.malthusian_death(d)(population, 0) == pytest.approx(expected)
 
-    arguments:
-        description: States the tests purpose to aid with debugging, it is logged when a test fails
-        function: The death function to be tested.
-        population: The input population
-        expected_result: The expected result to run the test with
 
-    """
-
-    assert function(population) == expected_result
+def test_malthusian_death_independent_of_time():
+    f = death.malthusian_death(0.1)
+    assert f(100, 0) == f(100, 50)

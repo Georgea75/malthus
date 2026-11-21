@@ -3,51 +3,28 @@ import malthus.birth as birth
 
 
 @pytest.mark.parametrize(
-    "description, function, time, expected_result",
+    "b, population, expected",
     [
-        ("Tests a population of zero", birth.malthusian_birth(0, 0.1), 100, 0),
-        (
-            "Tests a negative birth rate",
-            birth.malthusian_birth(10, -0.1),
-            10,
-            3.6787944117144233,
-        ),
-        ("Tests a birth rate of zero", birth.malthusian_birth(10, 0), 10, 10),
-        (
-            "Tests a birth rate greater than one",
-            birth.malthusian_birth(10, 1.1),
-            10,
-            598741.4171519781,
-        ),
-        (
-            "Tests a float time interval",
-            birth.malthusian_birth(10, 0.1),
-            5.5,
-            17.332530178673952,
-        ),
-        (
-            "Tests simple calculation",
-            birth.malthusian_birth(10, 0.1),
-            10,
-            27.18281828459045,
-        ),
-        (
-            "Tests very small birth rate",
-            birth.malthusian_birth(1, 0.0001),
-            1,
-            1.0001000050001667,
-        ),
+        pytest.param(0.1, 0, 0, id="zero population"),
+        pytest.param(0.0, 100, 0, id="zero birth rate"),
+        pytest.param(0.1, 100, 10, id="simple calculation"),
+        pytest.param(1.5, 100, 150, id="birth rate above one"),
+        pytest.param(0.0001, 1, 0.0001, id="very small birth rate"),
     ],
 )
-def test_malthus_birth_function(description, function, time, expected_result):
-    """
-    Tests the malthus birth function using a parametrized set of inputs
+def test_malthusian_birth(b, population, expected):
+    assert birth.malthusian_birth(b)(population, 0) == pytest.approx(expected)
 
-    arguments:
-        description: States the tests purpose to aid with debugging, it is logged when a test fails
-        function: The birth function to be tested.
-        population: The input population
-        expected_result: The expected result to run the test with
 
-    """
-    assert function(time) == expected_result
+@pytest.mark.parametrize(
+    "population, expected",
+    [
+        pytest.param(0, 0, id="zero population"),
+        pytest.param(500, 125, id="half capacity: 0.5 * 500 * 0.5"),
+        pytest.param(1000, 0, id="at capacity"),
+        pytest.param(1500, 0, id="above capacity is floored at zero"),
+    ],
+)
+def test_logistic_birth(population, expected):
+    f = birth.logistic_birth(r_max=0.5, carrying_capacity=1000)
+    assert f(population, 0) == pytest.approx(expected)

@@ -1,25 +1,21 @@
-"""
-Death functions
-
-A collection of death rate functions suitable for population dynamics models. 
-"""
-
 from typing import Callable
 
 
-def malthusian_death(d: float) -> Callable:
+def malthusian_death(d: float) -> Callable[[float, int], float]:
     """
-    Calculate the Malthusian death rate at a given population size.
+    Create a Malthusian (density-independent) death function.
+
+    Deaths per step are proportional to the population at the start of the
+    step: D_t = d * P_t.
 
     Args:
-    P (float): Population size.
-    d (float): Death rate constant.
+    d (float): Per-capita death rate per time step (0 <= d <= 1).
 
     Returns:
-    Callable: Death rate at the population size P.
+    Callable: f(P, t) returning the number of deaths in the step.
     """
 
-    def malthusian_death_function(P: float) -> float:
-        return -d * P
+    def malthusian_death_function(P: float, t: int) -> float:
+        return d * P
 
     return malthusian_death_function

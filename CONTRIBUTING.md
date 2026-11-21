@@ -23,3 +23,4 @@ Code is formatted using the PEP8 compliant `black` package. This can be run manu
 
 ```
 poetry run black malthus
+```
