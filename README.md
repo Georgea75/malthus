@@ -14,22 +14,27 @@ pip install malthus
 
 ### Generating birth and death functions
 
-To instantiate a model death and birth function needs to be declared. 
+A model needs a birth function and a death function. Each one takes the
+population at the start of a step `P` and the step number `t`, and returns
+the number of births or deaths in that step.
 
 ```
 from malthus import death, birth
 
-death = death.linearDeath(0.01)
-birth = birth.MalthusianBirth(0.01, 100)
-
+death_function = death.malthusian_death(0.1)
+birth_function = birth.malthusian_birth(0.2)
 ```
 
-The linear death model takes one argument:
-- death rate (float): A rate between 0 and 1 used to calculate the number of deaths
+The Malthusian death function takes one argument:
+- d (float): Per-capita death rate per step (0 to 1). Deaths per step = d × P.
 
-The malthusian birth model takes two arguments:
-- birth rate (float): A rate between 0 and 1 used to calculate the number of births.
-- initial population (int): The size of the initial population. 
+The Malthusian birth function takes one argument:
+- b (float): Per-capita birth rate per step. Births per step = b × P.
+
+The logistic birth function takes two arguments:
+- r_max (float): Maximum per-capita birth rate per step.
+- carrying_capacity (float): The population K at which births fall to zero.
+  Births per step = r_max × P × (1 − P/K).
 
 ### Instantiating a model
 
@@ -41,8 +46,12 @@ The model constructor takes three arguments:
 ```
 from malthus import models
 
-model = models.PopulationDynamicsModel(100)
+model = models.PopulationDynamicsModel(100, death_function, birth_function)
 ```
+
+Each step, the population is updated using the discrete balancing equation
+P(t+1) = P(t) + B(t) − D(t), where births and deaths are both calculated from
+P(t). With Malthusian births and deaths this gives P(t) = P(0) × (1 + b − d)^t.
 
 ### Obtaining results
 
@@ -86,7 +95,7 @@ model.describe(10)
 
 #### Compute
 
-The compute function returns the births, deaths, and total population from the current time step to the step provided to the function. The use of compute does not change the current step of the iterator.
+The compute function runs the model from the initial population and returns the deaths, births, and total population at the end of each step, up to and including the step provided. The use of compute does not change the current step or population of the iterator.
 
 Compute takes one argument:
 
@@ -106,8 +115,8 @@ The `PopulationDynamicsModel` class represents a basic population dynamics model
 
 ##### Attributes
 - `population` (int): The current population size.
-- `death` (Callable): The death function, which calculates the number of deaths based on the current population.
-- `birth` (Callable): The birth function, which calculates the number of births based on the current step.
+- `death` (Callable): `f(P, t)`, the number of deaths in a step, given the population at the start of the step and the step number.
+- `birth` (Callable): `f(P, t)`, the number of births in a step, given the population at the start of the step and the step number.
 - `step` (int): The current step of the population model.
 
 ##### Methods
@@ -119,7 +128,7 @@ The `PopulationDynamicsModel` class represents a basic population dynamics model
   - `steps` (int): The step to calculate the results for.
 
 - **`compute(self, steps: int) -> Tuple[List[float], List[float], List[float]]`**
-  Retrieves the next n steps of the modeled data and returns it as three lists.
+  Runs the model from the initial population for n steps and returns the results as three lists. The iterator's current step and population are not modified.
 
   Parameters:
   - `steps` (int): The maximum step to compute the results for.
@@ -127,7 +136,7 @@ The `PopulationDynamicsModel` class represents a basic population dynamics model
   Returns:
   - `death_data` (List[float]): Deaths recorded in each step.
   - `birth_data` (List[float]): Births recorded in each step.
-  - `population_data` (List[float]): Total population in each step.
+  - `population_data` (List[float]): Total population at the end of each step.
 
 ### Death Functions
 
@@ -136,10 +145,10 @@ The "Death Functions" module provides a collection of death rate functions suita
 - **Function: `malthusian_death`**
   
   **Parameters**
-  - `d` (float): Death rate constant.
+  - `d` (float): Per-capita death rate per step (0 to 1).
 
   **Returns**
-  - `malthusian_death_function` (Callable): A function that takes the population size (`P`) as input and returns the Malthusian death rate at that population size.
+  - `malthusian_death_function` (Callable): A function `f(P, t)` that returns the number of deaths in a step, `d × P`.
 
 ### Birth Functions
 
@@ -148,11 +157,19 @@ The "Birth Functions" module provides a collection of birth rate functions suita
 - **Function: `malthusian_birth`**
   
   **Parameters**
-  - `P0` (float): Initial population size.
-  - `r` (float): Population growth rate.
+  - `b` (float): Per-capita birth rate per step.
 
   **Returns**
-  - `malthusian_birth_function` (Callable): A function that takes the time (`t`) as input and returns the population size at that time using the Malthusian growth model.
+  - `malthusian_birth_function` (Callable): A function `f(P, t)` that returns the number of births in a step, `b × P`.
+
+- **Function: `logistic_birth`**
+  
+  **Parameters**
+  - `r_max` (float): Maximum per-capita birth rate per step.
+  - `carrying_capacity` (float): The population size `K` at which births fall to zero.
+
+  **Returns**
+  - `logistic_birth_function` (Callable): A function `f(P, t)` that returns the number of births in a step, `r_max × P × (1 − P/K)`, floored at zero. Combined with a Malthusian death rate `d`, the population settles at `K × (1 − d/r_max)`.
   
 ## Name
 
